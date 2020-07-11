@@ -14,7 +14,7 @@ node_modules/
 .vscode
 
 #python venv
-bin/
+env/
 
 third_party/
 
