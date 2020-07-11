@@ -1,0 +1,10 @@
+APScheduler==3.6.3
+future==0.17.1
+futures==3.3.0
+grpcio==1.29.0
+grpcio-tools==1.29.0
+mysql-connector-python==8.0.20
+protobuf==3.11.3
+python-crontab==2.5.1
+requests==2.23.0
+
