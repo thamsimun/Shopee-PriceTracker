@@ -15,3 +15,6 @@ node_modules/
 
 #python venv
 bin/
+
+third_party/
+
