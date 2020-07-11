@@ -1,0 +1,86 @@
+version: '3'
+
+services:
+    react-nginx:
+        build: ./front-end
+        ports:
+            - "80:80"
+        depends_on: 
+            - api-gateway
+        restart: always
+    api-gateway:
+        build: ./api-gateway
+        expose:
+            - "8181"
+        ports:
+            - "8181:8181"
+        depends_on:
+            - user-service
+            - price-service
+        restart: always
+        environment:
+            WAIT_HOSTS: db:3306
+    price-service:
+        build: ./grpc-price-microservice
+        command: sh -c './wait-for db:3306 --timeout=40 -- ./commands.sh'
+        expose:
+            - "8080"
+        depends_on: 
+            - "db"
+    user-service:
+        build: ./grpc-user-microservice
+        command: sh -c './wait-for db:3306 --timeout=40 -- go run ./cmd/server/main.go'
+        expose:
+            - "50051"
+        depends_on: 
+            - "db"
+        restart: always
+    db:
+        image: mysql:8.0.20
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: Garena.com
+        expose:
+            - "3306"
+        volumes:
+            - ./db/init:/docker-entrypoint-initdb.d
+            - my-db:/var/lib/mysql
+    prom:
+        image: quay.io/prometheus/prometheus:v2.0.0
+        # build: ./monitor
+        volumes:
+            - ./monitor/prometheus.yml:/etc/prometheus/prometheus.yml
+        command: "--config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus"
+        ports:
+            - 9090:9090
+        depends_on:
+            - exporter
+    exporter:
+        image: prom/node-exporter:latest
+        ports:
+            - "9100:9100"
+    #    network_mode: host
+    grafana:
+        image: grafana/grafana
+        ports:
+            - "3000:3000"
+        depends_on:
+            - prom
+        volumes:
+            - grafana-storage:/var/lib/grafana
+    cadvisor:
+        image: google/cadvisor:latest
+        ports:
+            - 8282:8080
+        volumes:
+            - /:/rootfs:ro
+            - /var/run:/var/run:rw
+            - /sys:/sys:ro
+            - /var/lib/docker/:/var/lib/docker:ro
+        depends_on:
+            - api-gateway
+            
+volumes:
+    my-db: {}
+    grafana-storage: {}
+  

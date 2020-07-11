@@ -1,0 +1,20 @@
+.DS_Store
+
+# Logs
+logs
+*.Logs
+# Compiled directory and file
+build/
+bundle.js
+# Dependency directories
+node_modules/
+
+#Editor directories and files
+.idea
+.vscode
+
+#python venv
+bin/
+
+third_party/
+

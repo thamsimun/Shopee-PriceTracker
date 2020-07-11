@@ -1,0 +1,127 @@
+syntax = "proto3";
+option go_package = ".;userServicePackage";
+package userServicePackage;
+
+// User details
+message UserProfile {
+    // Unique username of user
+    string user_name = 1;
+    // Hashed password of user
+    string pw = 2;
+}
+
+//create new user (register)
+message CreateUserRequest {
+    //user profile to create and add
+    UserProfile newUserProfile = 2;
+}
+
+// message DuplicateError {
+//     //1 when resource already exist, -1 otherwise
+//     int64 duplicate = 1;
+//     string error = 2;
+// }
+
+// message NotFoundError {
+//     //1 when it is not found -1 when it is found
+//     int64 notFound = 1;
+//     string error = 2;
+// }
+
+// message AuthenticateError {
+//     //1 when there is an authentication error -1 when there isnt
+//     int64 authenticate = 1;
+//     string error = 2;
+// }
+
+//return user id in db
+message CreateUserResponse {
+    //user named
+    string user_name = 1;
+    //duplicate error
+    int64 duplicate = 2;
+}
+
+//authenticate user in db (during sign in)
+message ReadUserRequest {
+    //user profile
+    UserProfile userProfile = 1;
+}
+
+message ReadUserResponse {
+    //user_name if found
+    string user_name = 1;
+    //user name not found or pw wrong
+    int64 incorrect = 2;
+}
+
+//User list of items to track
+message UserCart {
+    // User id
+    string user_name = 1;
+    // list of item_ids
+    repeated int64 item_id = 2;
+}
+
+message UserItem {
+    // user id
+    string user_name = 1;
+    // item id
+    int64 item_id = 2;
+}
+
+message AddItemRequest {
+    //user item to add
+    UserItem userItem = 1;
+}
+
+message AddItemResponse {
+    //item_id
+    int64 item_id = 1;
+    //duplicate error
+    int64 duplicate = 2;
+}
+
+message ReadAllListRequest{ 
+    //user_name to see list of items
+    string user_name = 1;
+    int64 offset = 2;
+    int64 limit = 3;
+
+}
+
+message ReadAllListResponse {
+    // list of item_ids
+    repeated int64 item_id = 1;
+    //empty
+    int64 empty = 2;
+}
+
+message DeleteItemRequest {
+    //user name and item id
+    UserItem useritem = 1;
+}
+
+message DeleteItemResponse {
+    //return item_id to indicate success
+    int64 item_id = 1;
+    //notFound
+    int64 notFound = 2;
+}
+
+
+service UserService {
+
+    rpc CreateItem(AddItemRequest) returns (AddItemResponse);
+    
+    rpc ReadAllItem(ReadAllListRequest) returns (ReadAllListResponse);
+
+    rpc DeleteItem(DeleteItemRequest) returns (DeleteItemResponse);
+
+    rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+
+    rpc ReadUser(ReadUserRequest) returns (ReadUserResponse);
+}
+
+
+
